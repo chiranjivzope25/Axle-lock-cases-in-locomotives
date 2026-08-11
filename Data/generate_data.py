@@ -66,8 +66,8 @@ def locomotive_dynamics(t, y):
     # Motor Torque (Constant tractive effort up to cruise speed)
     T_motor = 3500.0 if v_loco < (80.0 / 3.6) else 1000.0  # N*m per axle
     
-    # FAULT INJECTION: At t = 15s to 25s, Axle 1 suffers a massive bearing seizure
-    T_fault_axle1 = 65000.0 if (15.0 <= t <= 25.0) else 0.0
+    # FAULT INJECTION: At t = 30s to 45s (15 seconds), Axle 1 suffers a massive bearing seizure
+    T_fault_axle1 = 65000.0 if (30.0 <= t <= 45.0) else 0.0
     
     # Calculate forces and derivative rates for each axle
     F_x_total = 0.0
@@ -92,11 +92,11 @@ def locomotive_dynamics(t, y):
 # ==========================================
 # 4. RUN SIMULATION & EXPORT DATASET
 # ==========================================
-print("Running Python Physics Simulation...")
+print("Running Physics Simulation for 10,000 rows...")
 
-# Time Span: 40 seconds at 100 Hz resolution
-t_span = (0.0, 40.0)
-t_eval = np.linspace(0.0, 40.0, 4000)
+# Time Span: 100 seconds at 100 Hz resolution = Exactly 10,000 rows
+t_span = (0.0, 100.0)
+t_eval = np.linspace(0.0, 100.0, 10000)
 
 # Initial conditions: Loco starting at 30 km/h (8.33 m/s) with wheels rolling at equivalent speed
 v_init = 30.0 / 3.6
@@ -120,7 +120,7 @@ df = pd.DataFrame(data)
 
 # Compute Features & Fault Labels
 df['axle1_slip_ratio'] = ( (df['v_loco_kmh']/3.6/r_wheel) - df['axle1_speed_rads'] ) / np.maximum(df['v_loco_kmh']/3.6/r_wheel, 0.1)
-df['axle_lock_label'] = ((df['time_s'] >= 15.0) & (df['time_s'] <= 25.0)).astype(int)
+df['axle_lock_label'] = ((df['time_s'] >= 30.0) & (df['time_s'] <= 45.0)).astype(int)
 
 # Add Synthetic Sensor Noise
 df['axle1_speed_noisy'] = df['axle1_speed_rads'] + np.random.normal(0, 0.1, len(df))
@@ -128,4 +128,4 @@ df['axle1_speed_noisy'] = df['axle1_speed_rads'] + np.random.normal(0, 0.1, len(
 # Save to CSV
 output_filename = "locomotive_axle_lock_python_sim.csv"
 df.to_csv(output_filename, index=False)
-print(f"Dataset successfully created and exported to '{output_filename}'!")
+print(f"Dataset successfully created! Total Rows: {len(df)} exported to '{output_filename}'.")
