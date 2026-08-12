@@ -1,7 +1,7 @@
 [project]
 name = "axle-lock-cases-in-locomotives"
 version = "0.1.0"
-description = "Add your description here"
+description = "Locomotive Axle Lock Early Warning System"
 readme = "README.md"
 requires-python = ">=3.10"
 
