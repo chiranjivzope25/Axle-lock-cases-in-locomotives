@@ -1,0 +1,10 @@
+.venv
+.venv/
+__pycache__
+Data/
+frontend.py
+training_model.py
+.git
+.gitignore
+README.md
+readme.txt
