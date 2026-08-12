@@ -5,8 +5,8 @@ from fastapi import FastAPI
 app = FastAPI()
 
 # Load saved artifacts
-model = joblib.load(r"models\axle_lock_xgb.joblib")
-transformer = joblib.load(r"models\power_transformer.joblib")
+model = joblib.load("models/axle_lock_xgb.joblib")
+transformer = joblib.load("models/power_transformer.joblib")
 
 @app.get("/")
 def home():
