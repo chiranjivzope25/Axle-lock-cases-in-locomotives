@@ -9,4 +9,5 @@ git remote add origin https://github.com/chiranjivzope25/Axle-lock-cases-in-loco
 git push -u origin main
 
 # to run frontend :- streamlit run frontend.py
-chirag-realtime-loco-axle-lock-analytics
+chirag-realtime-loco-axle-lock-analytics 
+# to run backend uvicorn app:app -reload

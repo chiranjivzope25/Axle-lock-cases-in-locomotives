@@ -14,7 +14,7 @@ st.markdown("Under-Carriage Mechanical Structure with Independent Heating, Brake
 # Friendly tip for mobile users regarding sidebar
 
 
-FASTAPI_URL = "https://locomotive-axle-api.vercel.app/predict"
+FASTAPI_URL = "https://backend-for-locomotive.vercel.app"
 
 # -------------------------------------------------------------
 # SIDEBAR: SENSOR TELEMETRY INPUT CONTROLS (ALL 4 AXLES)
