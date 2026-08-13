@@ -1,10 +1,18 @@
-.venv
-.venv/
-__pycache__
+# Exclude heavy datasets and data generation scripts
 Data/
+*.csv
+
+# Exclude local Python environments & caches
+.venv/
+env/
+venv/
+__pycache__/
+*.pyc
+
+# Exclude Streamlit frontend & training scripts
 frontend.py
+streamlit.py
 training_model.py
-.git
-.gitignore
-README.md
-readme.txt
+training_for_phy.py
+*.md
+*.txt
