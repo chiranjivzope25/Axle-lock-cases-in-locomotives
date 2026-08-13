@@ -11,9 +11,10 @@ st.set_page_config(
 st.title("⚙️ Dual 2-Axle Bogie Chassis Real-Time Digital Twin")
 st.markdown("Under-Carriage Mechanical Structure with Independent Heating, Brakes, and Vibration for All 4 Axles")
 
-FASTAPI_URL = "http://127.0.0.1:8000/predict"
+FASTAPI_URL = "https://your-locomotive-api.vercel.app/predict"
 
-# -------------------------------------------------------------
+# --------
+# -----------------------------------------------------
 # SIDEBAR: SENSOR TELEMETRY INPUT CONTROLS (ALL 4 AXLES)
 # -------------------------------------------------------------
 st.sidebar.header("📊 Locomotive Sensor Inputs")
