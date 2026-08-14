@@ -10,4 +10,4 @@ git push -u origin main
 
 # to run frontend :- streamlit run frontend.py
 chirag-realtime-loco-axle-lock-analytics 
-# to run backend uvicorn app:app -reload
+# to run backend uvicorn app:app --reload
