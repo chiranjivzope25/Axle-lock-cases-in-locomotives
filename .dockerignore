@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+Data/
+*.csv
+.git/
+.gitignore
+README.md
+readme.txt
