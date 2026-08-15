@@ -8,14 +8,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from huggingface_hub import hf_hub_download
 import uvicorn
 
+# Hugging Face Model Repository ID
 REPO_ID = "Chiranjivzope25/axle-lock-models"
 
-# Storage dictionary for model instances
+# Storage dictionary for model instances in global memory
 artifacts = {}
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Load model artifacts at application startup
+    # -------------------------------------------------------------
+    # LOAD ARTIFACTS FROM HUGGING FACE MODEL HUB ON STARTUP
+    # -------------------------------------------------------------
     try:
         path_kinematic = hf_hub_download(repo_id=REPO_ID, filename="axle_lock_xgb.joblib")
         path_transformer_kin = hf_hub_download(repo_id=REPO_ID, filename="power_transformer.joblib")
@@ -65,12 +68,15 @@ class PhysicalInput(BaseModel):
     axle1_bearing_temp_c: float = Field(..., json_schema_extra={"example": 105.4})
     axle1_vibration_g: float = Field(..., json_schema_extra={"example": 3.8})
     axle1_motor_current_amp: float = Field(..., json_schema_extra={"example": 520.0})
+    
     axle2_bearing_temp_c: float = Field(..., json_schema_extra={"example": 45.0})
     axle2_vibration_g: float = Field(..., json_schema_extra={"example": 0.3})
     axle2_motor_current_amp: float = Field(..., json_schema_extra={"example": 300.0})
+    
     axle3_bearing_temp_c: float = Field(..., json_schema_extra={"example": 46.2})
     axle3_vibration_g: float = Field(..., json_schema_extra={"example": 0.35})
     axle3_motor_current_amp: float = Field(..., json_schema_extra={"example": 305.0})
+    
     axle4_bearing_temp_c: float = Field(..., json_schema_extra={"example": 44.8})
     axle4_vibration_g: float = Field(..., json_schema_extra={"example": 0.28})
     axle4_motor_current_amp: float = Field(..., json_schema_extra={"example": 298.0})
@@ -92,10 +98,11 @@ def home():
 @app.post("/predict")
 def predict(request: DualModelRequest):
     try:
+        # Pydantic v2 syntax: .model_dump()
         df_kinematic = pd.DataFrame([request.data_axel.model_dump()])
         df_phy = pd.DataFrame([request.data_phy.model_dump()])
         
-        # Pull loaded artifacts from app state
+        # Pull loaded artifacts from global app state
         transformer_kinematic = artifacts["transformer_kinematic"]
         transformer_phy = artifacts["transformer_phy"]
         model_kinematic = artifacts["model_kinematic"]
