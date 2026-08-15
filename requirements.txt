@@ -1,8 +1,4 @@
-fastapi
-uvicorn
-pandas
-xgboost
+numpy>=1.24.0,<2.0.0
+scikit-learn>=1.4.0
 joblib
-scikit-learn==1.3.0
-pydantic
-huggingface_hub
+xgboost
