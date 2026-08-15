@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
 from huggingface_hub import hf_hub_download
 import uvicorn
-
+from huggingface_hub import spaces
 # Hugging Face Model Repository ID
 REPO_ID = "Chiranjivzope25/axle-lock-models"
 
