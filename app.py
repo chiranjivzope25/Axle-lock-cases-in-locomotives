@@ -24,11 +24,11 @@ app.add_middleware(
 # 1. LOAD ARTIFACTS WITH STRICT FAILURE HANDLING
 # -------------------------------------------------------------
 try:
-    model_kinematic = joblib.load("models/axle_lock_xgb.joblib")
-    transformer_kinematic = joblib.load("models/power_transformer.joblib")
+    model_kinematic = joblib.load("https://drive.google.com/drive/u/0/folders/1w5W10qcUGBDg_-iGGpbWgltJ9W1Pp-ai")
+    transformer_kinematic = joblib.load("https://drive.google.com/drive/u/0/folders/1w5W10qcUGBDg_-iGGpbWgltJ9W1Pp-ai")
     
-    model_phy = joblib.load("models/phy_axle_lock_xgb.joblib")
-    transformer_phy = joblib.load("models/phy_power_transformer.joblib")
+    model_phy = joblib.load("https://drive.google.com/drive/u/0/folders/1w5W10qcUGBDg_-iGGpbWgltJ9W1Pp-ai")
+    transformer_phy = joblib.load("https://drive.google.com/drive/u/0/folders/1w5W10qcUGBDg_-iGGpbWgltJ9W1Pp-ai")
     print("✅ All ML models and transformers loaded successfully!")
 except Exception as e:
     # Fail fast: prevent the server from running in a broken state
