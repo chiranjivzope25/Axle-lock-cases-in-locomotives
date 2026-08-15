@@ -1,55 +1,57 @@
 import os
 import joblib
 import pandas as pd
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
 from huggingface_hub import hf_hub_download
 import uvicorn
 
+REPO_ID = "Chiranjivzope25/axle-lock-models"
+
+# Storage dictionary for model instances
+artifacts = {}
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Load model artifacts at application startup
+    try:
+        path_kinematic = hf_hub_download(repo_id=REPO_ID, filename="axle_lock_xgb.joblib")
+        path_transformer_kin = hf_hub_download(repo_id=REPO_ID, filename="power_transformer.joblib")
+        path_phy = hf_hub_download(repo_id=REPO_ID, filename="phy_axle_lock_xgb.joblib")
+        path_transformer_phy = hf_hub_download(repo_id=REPO_ID, filename="phy_power_transformer.joblib")
+
+        artifacts["model_kinematic"] = joblib.load(path_kinematic)
+        artifacts["transformer_kinematic"] = joblib.load(path_transformer_kin)
+        artifacts["model_phy"] = joblib.load(path_phy)
+        artifacts["transformer_phy"] = joblib.load(path_transformer_phy)
+
+        print("✅ All ML models and transformers loaded successfully from Hugging Face Hub!")
+    except Exception as e:
+        print(f"❌ Critical Error loading ML models: {e}")
+        raise RuntimeError(e)
+    
+    yield
+    artifacts.clear()
 
 app = FastAPI(
     title="Locomotive Axle Lock Early Warning System",
     description="Two-Stage Kinematic & Physical Sensor Fusion API",
-    version="2.0"
+    version="2.0",
+    lifespan=lifespan
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust to specific domains in production if needed
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
 # -------------------------------------------------------------
-# 1. LOAD ARTIFACTS FROM HUGGING FACE MODEL HUB
-# -------------------------------------------------------------
-REPO_ID = "Chiranjivzope25/axle-lock-models"
-
-try:
-    # Download files from your Hugging Face model repository
-    path_kinematic = hf_hub_download(repo_id=REPO_ID, filename="axle_lock_xgb.joblib")
-    path_transformer_kin = hf_hub_download(repo_id=REPO_ID, filename="power_transformer.joblib")
-    
-    path_phy = hf_hub_download(repo_id=REPO_ID, filename="phy_axle_lock_xgb.joblib")
-    path_transformer_phy = hf_hub_download(repo_id=REPO_ID, filename="phy_power_transformer.joblib")
-
-    # Load artifacts using joblib
-    model_kinematic = joblib.load(path_kinematic)
-    transformer_kinematic = joblib.load(path_transformer_kin)
-
-    model_phy = joblib.load(path_phy)
-    transformer_phy = joblib.load(path_transformer_phy)
-
-    print("✅ All ML models and transformers loaded successfully from Hugging Face!")
-except Exception as e:
-    raise RuntimeError(f"❌ Critical Error loading ML models: {e}")
-
-
-# -------------------------------------------------------------
-# 2. PYDANTIC SCHEMAS
+# PYDANTIC SCHEMAS
 # -------------------------------------------------------------
 class KinematicInput(BaseModel):
     v_loco_kmh: float = Field(..., json_schema_extra={"example": 80.0})
@@ -63,15 +65,12 @@ class PhysicalInput(BaseModel):
     axle1_bearing_temp_c: float = Field(..., json_schema_extra={"example": 105.4})
     axle1_vibration_g: float = Field(..., json_schema_extra={"example": 3.8})
     axle1_motor_current_amp: float = Field(..., json_schema_extra={"example": 520.0})
-    
     axle2_bearing_temp_c: float = Field(..., json_schema_extra={"example": 45.0})
     axle2_vibration_g: float = Field(..., json_schema_extra={"example": 0.3})
     axle2_motor_current_amp: float = Field(..., json_schema_extra={"example": 300.0})
-    
     axle3_bearing_temp_c: float = Field(..., json_schema_extra={"example": 46.2})
     axle3_vibration_g: float = Field(..., json_schema_extra={"example": 0.35})
     axle3_motor_current_amp: float = Field(..., json_schema_extra={"example": 305.0})
-    
     axle4_bearing_temp_c: float = Field(..., json_schema_extra={"example": 44.8})
     axle4_vibration_g: float = Field(..., json_schema_extra={"example": 0.28})
     axle4_motor_current_amp: float = Field(..., json_schema_extra={"example": 298.0})
@@ -81,7 +80,7 @@ class DualModelRequest(BaseModel):
     data_phy: PhysicalInput
 
 # -------------------------------------------------------------
-# 3. ENDPOINTS
+# ENDPOINTS
 # -------------------------------------------------------------
 @app.get("/")
 def home():
@@ -93,9 +92,14 @@ def home():
 @app.post("/predict")
 def predict(request: DualModelRequest):
     try:
-        # Pydantic v2 syntax: .model_dump()
         df_kinematic = pd.DataFrame([request.data_axel.model_dump()])
         df_phy = pd.DataFrame([request.data_phy.model_dump()])
+        
+        # Pull loaded artifacts from app state
+        transformer_kinematic = artifacts["transformer_kinematic"]
+        transformer_phy = artifacts["transformer_phy"]
+        model_kinematic = artifacts["model_kinematic"]
+        model_phy = artifacts["model_phy"]
         
         # 1. Transform Features
         x_scaled_kin = transformer_kinematic.transform(df_kinematic)
@@ -158,5 +162,6 @@ def predict(request: DualModelRequest):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
             detail=f"Inference Error: {str(e)}"
         )
+
 if __name__ == "__main__":
     uvicorn.run("app:app", host="0.0.0.0", port=7860, reload=False)
