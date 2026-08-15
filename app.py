@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
 from huggingface_hub import hf_hub_download
+import uvicorn
 
 
 app = FastAPI(
@@ -157,3 +158,5 @@ def predict(request: DualModelRequest):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
             detail=f"Inference Error: {str(e)}"
         )
+    if __name__ == "__main__":
+    uvicorn.run("app:app", host="0.0.0.0", port=7860, reload=False)
