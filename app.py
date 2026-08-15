@@ -89,6 +89,7 @@ class DualModelRequest(BaseModel):
 # ENDPOINTS
 # -------------------------------------------------------------
 @app.get("/")
+@spaces.GPU
 def home():
     return {
         "status": "Online",
@@ -96,6 +97,7 @@ def home():
     }
 
 @app.post("/predict")
+@spaces.GPU
 def predict(request: DualModelRequest):
     try:
         # Pydantic v2 syntax: .model_dump()
