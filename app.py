@@ -4,6 +4,7 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
+from huggingface_hub import hf_hub_download
 
 
 app = FastAPI(
@@ -20,19 +21,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # -------------------------------------------------------------
-# 1. LOAD ARTIFACTS WITH STRICT FAILURE HANDLING
+# 1. LOAD ARTIFACTS FROM HUGGING FACE MODEL HUB
 # -------------------------------------------------------------
+REPO_ID = "Chiranjivzope25/axle-lock-models"
+
 try:
-    model_kinematic = joblib.load("https://drive.google.com/drive/u/0/folders/1w5W10qcUGBDg_-iGGpbWgltJ9W1Pp-ai")
-    transformer_kinematic = joblib.load("https://drive.google.com/drive/u/0/folders/1w5W10qcUGBDg_-iGGpbWgltJ9W1Pp-ai")
+    # Download files from your Hugging Face model repository
+    path_kinematic = hf_hub_download(repo_id=REPO_ID, filename="axle_lock_xgb.joblib")
+    path_transformer_kin = hf_hub_download(repo_id=REPO_ID, filename="power_transformer.joblib")
     
-    model_phy = joblib.load("https://drive.google.com/drive/u/0/folders/1w5W10qcUGBDg_-iGGpbWgltJ9W1Pp-ai")
-    transformer_phy = joblib.load("https://drive.google.com/drive/u/0/folders/1w5W10qcUGBDg_-iGGpbWgltJ9W1Pp-ai")
-    print("✅ All ML models and transformers loaded successfully!")
+    path_phy = hf_hub_download(repo_id=REPO_ID, filename="phy_axle_lock_xgb.joblib")
+    path_transformer_phy = hf_hub_download(repo_id=REPO_ID, filename="phy_power_transformer.joblib")
+
+    # Load artifacts using joblib
+    model_kinematic = joblib.load(path_kinematic)
+    transformer_kinematic = joblib.load(path_transformer_kin)
+
+    model_phy = joblib.load(path_phy)
+    transformer_phy = joblib.load(path_transformer_phy)
+
+    print("✅ All ML models and transformers loaded successfully from Hugging Face!")
 except Exception as e:
-    # Fail fast: prevent the server from running in a broken state
     raise RuntimeError(f"❌ Critical Error loading ML models: {e}")
+
 
 # -------------------------------------------------------------
 # 2. PYDANTIC SCHEMAS
