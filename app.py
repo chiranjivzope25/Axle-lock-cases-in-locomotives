@@ -158,5 +158,5 @@ def predict(request: DualModelRequest):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
             detail=f"Inference Error: {str(e)}"
         )
-    if __name__ == "__main__":
+if __name__ == "__main__":
     uvicorn.run("app:app", host="0.0.0.0", port=7860, reload=False)
