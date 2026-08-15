@@ -1,3 +1,14 @@
+
+---
+title: Chirag Locomotive
+sdk: gradio
+sdk_version: 4.35.0
+app_file: app.py
+pinned: false
+---
+
+# Axle Lock Cases in Locomotives
+Your README content continues here...
 # to activate env : .venv\Scripts\activate
 echo "# Axle-lock-cases-in-locomotives" >> README.md
 # git hub commands:-
@@ -11,3 +22,4 @@ git push -u origin main
 # to run frontend :- streamlit run frontend.py
 chirag-realtime-loco-axle-lock-analytics 
 # to run backend uvicorn app:app --reload
+
